@@ -2,15 +2,18 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.1",
-    "morgan": "^1.10.0"
+    "mongoose": "^6.5.0",
+    "morgan": "^1.10.0",
+    "pg-promise": "^10.11.1",
+    "postgres": "^3.2.4"
   },
   "name": "ratings-and-reviews",
   "description": "",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "npx nodemon server/index.js"
   },
   "repository": {
     "type": "git",

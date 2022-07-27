@@ -6,7 +6,7 @@ const route = require('./router.js')
 
 //Middleware
 app.use(express.json())
-
+app.use(cors())
 
 
 
