@@ -27,21 +27,7 @@ CREATE TABLE reviews (
   helpfulness INTEGER
 );
 
---removed b/c i feel like we dont need right now
--- CREATE TABLE results (
---   id SERIAL UNIQUE NOT NULL,
---   reviewss_id INTEGER,
---   review_id INTEGER,
---   rating INTEGER,
---   summary TEXT,
---   recommend BOOLEAN NOT NULL,
---   response TEXT,
---   body TEXT NOT NULL,
---   date DATE,
---   reviewer_name TEXT NOT NULL,
---   helpfulness INTEGER,
---   FOREIGN KEY (reviewss_id) REFERENCES reviews(product)
--- );
+
 
 --good
 CREATE TABLE photos (
@@ -72,51 +58,47 @@ CREATE TABLE characteristics_review (
   FOREIGN KEY (review_id) REFERENCES reviews(id)
 );
 
-/* /Characteristics removed for now... maybe will use to be mroe organized*/
--- CREATE TABLE comfort (
---   id SERIAL UNIQUE NOT NULL,
---   reviewss_id INTEGER,
---   id_character INTEGER,
---   value TEXT,
---   UNIQUE (id_character),
---   FOREIGN KEY (reviewss_id) REFERENCES reviews(product)
--- );
-
--- CREATE TABLE fit (
---   id SERIAL UNIQUE NOT NULL,
---   reviewss_id INTEGER,
---   id_character INTEGER,
---   value TEXT,
---   UNIQUE (id_character),
---   FOREIGN KEY (reviewss_id) REFERENCES reviews(product)
--- );
-
--- CREATE TABLE length (
---   id SERIAL UNIQUE NOT NULL,
---   reviewss_id INTEGER,
---   id_character INTEGER,
---   value TEXT,
---   UNIQUE (id_character),
---   FOREIGN KEY (reviewss_id) REFERENCES reviews(product)
--- );
-
--- CREATE TABLE quality (
---   id SERIAL UNIQUE NOT NULL,
---   reviewss_id INTEGER,
---   id_character INTEGER,
---   value TEXT,
---   UNIQUE (id_character),
---   FOREIGN KEY (reviewss_id) REFERENCES reviews(product)
--- );
 
 
--- need to copy the csv data
+
+-- need to copy the csv data ETL
 \COPY reviews FROM './data/reviews.csv' WITH (FORMAT CSV, HEADER);
+
 \COPY photos FROM './data/reviews_photos.csv' WITH (FORMAT CSV, HEADER);
+
 \COPY characteristics FROM './data/characteristics.csv' WITH (FORMAT CSV, HEADER);
+
 \COPY characteristics_review FROM './data/characteristic_reviews.csv' WITH (FORMAT CSV, HEADER);
 
 --need to change the format of the data in the reviews table
 ALTER TABLE review
 ALTER COLUMN review_date TYPE TIMESTAMP
 USING (to_timestamp(review_date::decimal/1000));
+
+--create my index for the important colums
+
+-- /reviews/
+/* table reviews, column product_id */
+CREATE INDEX reviews_product_id_index ON reviews(product_id);
+
+/* table reviews, column recommend  */
+CREATE INDEX reviews_recommend_index ON reviews(recommend);
+
+/* table photos, column review_id  */
+CREATE INDEX photos_review_id_index ON photos(reviews_id);
+
+--put req
+/* table reviews, column helpfulness DESC <-- decending order  */
+CREATE INDEX reviews_helpfulness_index ON reviews(helpfulness DESC);
+
+--based on sort
+/* table reviews, column date DESC <-- decending order  */
+CREATE INDEX reviews_date_index ON reviews(date DESC);
+
+-- reviews/meta
+/* table characteristics, column product_id, want to select * from characteristics where product_id = <REQ PROVIDED> */
+CREATE INDEX characteristics_product_id_index ON characteristics(product_id);
+
+/* table characteristics_review, column charactertistics_id,  */
+CREATE INDEX characteristics_review_charactertistics_id_index ON characteristics_review(characteristic_id);
+

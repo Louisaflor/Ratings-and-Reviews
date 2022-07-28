@@ -2,11 +2,14 @@ const express = require('express');
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
-const route = require('./router.js')
+const router = require('./router.js')
 
 //Middleware
 app.use(express.json())
 app.use(cors())
+
+//Tranfer to router file
+app.use('' , router);
 
 
 
