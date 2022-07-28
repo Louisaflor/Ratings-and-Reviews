@@ -7,7 +7,7 @@ const pool = new Pool({
   host: 'localhost',
   database: 'postgres_louisa',
   password: '',
-  port: 3100,
+  port: 3000,
 })
 
 //congifure the user,host, and other properties
