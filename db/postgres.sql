@@ -71,7 +71,7 @@ CREATE TABLE characteristics_review (
 \COPY characteristics_review FROM './data/characteristic_reviews.csv' WITH (FORMAT CSV, HEADER);
 
 --need to change the format of the data in the reviews table
-ALTER TABLE review
+ALTER TABLE reviews
 ALTER COLUMN review_date TYPE TIMESTAMP
 USING (to_timestamp(review_date::decimal/1000));
 
