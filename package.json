@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/Parks-Rec/Ratings-and-Reviews/issues"
   },
-  "homepage": "https://github.com/Parks-Rec/Ratings-and-Reviews#readme"
+  "homepage": "https://github.com/Parks-Rec/Ratings-and-Reviews#readme",
+  "devDependencies": {
+    "eslint": "^8.20.0",
+    "eslint-plugin-react": "^7.30.1"
+  }
 }
