@@ -72,8 +72,8 @@ CREATE TABLE characteristics_review (
 
 --need to change the format of the data in the reviews table
 ALTER TABLE reviews
-ALTER COLUMN review_date TYPE TIMESTAMP
-USING (to_timestamp(review_date::decimal/1000));
+ALTER COLUMN date TYPE TIMESTAMP
+USING (to_timestamp(date::decimal/1000));
 
 --create my index for the important colums
 
