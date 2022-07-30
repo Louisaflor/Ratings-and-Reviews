@@ -92,22 +92,30 @@ module.exports = {
     })
   },
 
-  postDate: function(req) {
+  postReviews: function(req) {
+    console.log("IN HERE")
     var date = new Date().toISOString();
-    console.log("SHOW ME DATA: ", req)
     return new Promise((resolve, reject) => {
-      pool.query((`INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
-                   VALUES('${req.product_id}', '${req.rating}', '${date}', '${req.summary}', '${req.body}', '${req.recommend}', false, '${req.name}', '${req.email}', 0)
-                  `), (err) => {
+      pool.query((`INSERT INTO reviews (review_id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
+      VALUES((SELECT setval ('"reviews_review_id_seq"', (SELECT MAX(review_id) FROM reviews)+1)), ${req.product_id}, ${req.rating}, '${date}', '${req.summary}', '${req.body}', ${req.recommend}, false, '${req.name}', '${req.email}', null, 0) returning *
+                  `), (err, data) => {
         if (err) {
+          console.log("ERROR WHEN POSTING DATA: ", err)
           reject(err)
         } else {
-          console.log("posted")
-          resolve('posted')
+          console.log("GOT IN HERE TOO: ")
+          resolve(data)
         }
       })
 
     })
+  },
+
+  postPhotos: function(id, photo) {
+    console.log("IN THE PHOTOS: ", id, photo)
+    return pool.query(`INSERT INTO photos (id, reviews_id, url)
+                      VALUES ((SELECT setval ('"photos_id_seq"', (SELECT MAX(id) FROM photos)+1)), ${id}, '${photo}')
+                      returning *`)
   },
 
   addHelpful: function(req) {
@@ -148,13 +156,14 @@ module.exports = {
 
 
 
+// req.photos.map((item) => {
+//   pool.query((`INSERT INTO photos (id, product_id, name)
+//               VALUES ((SELECT setval ('"photos_id_seq"', (SELECT MAX(id) FROM photos)+1)), ${req.product_id}, '${item}')`), (err) => {
+//     if (err) {
+//       reject(err)
+//     } else {
+//       resolve('added photos')
+//     }
+//   })
 
-
-
-// ),
-// test2 AS (
-//   INSERT INTO photos VALUES(reviews_id, url)
-//   VALUES (SELECT review_id FROM reviews WHERE product_id = ${req.product_id}, re )
-// )
-// INSERT INTO
-// '${req.product_id}', '${req.rating}', '${date}', '${req.summary}', '${req.body}', '${req.recommend}', false, '${req.name}', '${req.email}', 0)
+// })

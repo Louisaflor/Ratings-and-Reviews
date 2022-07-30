@@ -40,20 +40,29 @@ module.exports = {
       // console.log("WHAT IS THIS GOING TO BE: ", metaData)
       // console.log('test:  ',character)
       res.send(metaData)
-    } catch {
+    } catch (err) {
       res.send(metaData)
     }
   },
 
   post: async function(req, res) {
-    console.log("GOT IN POST")
+    console.log("GOT IN POST: ", req.body)
     try {
-      const data = await model.postDate(req.body)
-      console.log('data :', data)
+      const data = await model.postReviews(req.body)
+      console.log("DATA: ", data.rows[0].review_id)
+      return Promise.all(req.body.photos.map((photo) => {model.postPhotos(data.rows[0].review_id, photo)}))
+      .then((result) => {
+        console.log("GOT THE PHOTO RESULTS: ", result)
+        // res.send(results)
+      })
+      .catch((err) => {
+        console.log("error when posting photos: ", err)
+        res.send(err)
+      })
       res.send(data)
 
-    } catch {
-      res.send(data)
+    } catch (err) {
+     res.send(err)
     }
 
 
@@ -65,8 +74,8 @@ module.exports = {
     try {
       const data = await model.addHelpful(req.params.review_id)
       res.sendStatus(201)
-    } catch {
-      res.send(data)
+    } catch (err) {
+      res.send(err)
     }
 
   },
@@ -80,8 +89,8 @@ module.exports = {
     try {
       const data = await model.reportData(req.params.review_id)
       res.sendStatus(201)
-    } catch {
-      res.send()
+    } catch (err) {
+      res.send(err)
     }
   }
 

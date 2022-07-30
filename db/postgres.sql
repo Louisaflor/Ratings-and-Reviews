@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS characteristics_review CASCADE;
 
 --updated reviews
 CREATE TABLE reviews (
-  id SERIAL UNIQUE NOT NULL,
+  id SERIAL PRIMARY KEY,
   product_id INTEGER,
   rating INTEGER,
   date BIGINT NOT NULL,
@@ -29,12 +29,12 @@ CREATE TABLE reviews (
 
 
 
+
 --good
 CREATE TABLE photos (
-  id SERIAL UNIQUE NOT NULL,
+  id SERIAL PRIMARY KEY,
   reviews_id INTEGER,
   url TEXT,
-  UNIQUE (id),
   FOREIGN KEY (reviews_id) REFERENCES reviews(id)
 );
 
@@ -43,14 +43,14 @@ CREATE TABLE photos (
 
 --good
 CREATE TABLE characteristics (
-  id SERIAL UNIQUE NOT NULL,
+  id SERIAL PRIMARY KEY,
   product_id INTEGER,
   name TEXT
 );
 
 --good
 CREATE TABLE characteristics_review (
-  id SERIAL UNIQUE NOT NULL,
+  id SERIAL PRIMARY KEY,
   characteristic_id INTEGER,
   review_id INTEGER,
   value TEXT,
@@ -78,6 +78,26 @@ USING (to_timestamp(date::decimal/1000));
 --need to change the id colum in reviews TABLE
 ALTER TABLE reviews
 RENAME COLUMN id TO review_id;
+
+--creating a sequence
+CREATE SEQUENCE reviews_review_id_seq
+OWNED BY reviews.review_id;
+
+CREATE SEQUENCE photos_id_seq
+OWNED BY photos.id;
+
+CREATE SEQUENCE characteristics_id_seq
+OWNED BY characteristics.id;
+
+CREATE SEQUENCE characteristics_review_id_seq
+OWNED BY characteristics_review.id;
+
+--have to create set val for all the ids
+-- SELECT setval ('"reviews_review_id_seq"', (SELECT MAX(review_id) FROM reviews)+1);
+-- SELECT setval ('"photos_id_seq"', (SELECT MAX(id) FROM photos)+1);
+-- SELECT setval ('"characteristics_id_seq"', (SELECT MAX(id) FROM characteristics)+1);
+-- SELECT setval ('"characteristics_review_id_seq"', (SELECT MAX(id) FROM characteristics_review)+1);
+
 
 --create my index for the important colums
 
