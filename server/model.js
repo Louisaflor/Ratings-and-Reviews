@@ -7,7 +7,7 @@ module.exports = {
 
       if (typeof param.sort === 'object') {
         pool.query((`SELECT
-                    reviews.id,
+                    reviews.review_id,
                     reviews.rating,
                     reviews.summary,
                     reviews.recommend,
@@ -16,11 +16,11 @@ module.exports = {
                     reviews.date,
                     reviews.reviewer_name,
                     reviews.helpfulness,
-                    COALESCE ( json_agg( json_build_object( 'id', photos.id,  'url', photos.url)), '0' ) AS photos
+                    json_agg( COALESCE ( json_build_object( 'id', photos.id,  'url', photos.url), '[]')) AS photos
                     FROM reviews
-                    LEFT JOIN photos ON reviews.id = photos.reviews_id
+                    LEFT JOIN photos ON reviews.review_id = photos.reviews_id
                    WHERE reviews.product_id = ${param.product_id}
-                   GROUP BY reviews.id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, reviews.date, reviews.reviewer_name, reviews.helpfulness
+                   GROUP BY reviews.review_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, reviews.date, reviews.reviewer_name, reviews.helpfulness
                    ORDER BY reviews.${param.sort.helpful} DESC, reviews.${param.sort.date} DESC
                    limit ${param.count}`), (err, data) => {
           if (err) {
@@ -38,7 +38,7 @@ module.exports = {
         })
       } else {
         pool.query((`SELECT
-                    reviews.id,
+                    reviews.review_id,
                     reviews.rating,
                     reviews.summary,
                     reviews.recommend,
@@ -49,9 +49,9 @@ module.exports = {
                     reviews.helpfulness,
                     COALESCE ( json_agg( json_build_object( 'id', photos.id,  'url', photos.url)), '0' ) AS photos
                     FROM reviews
-                    LEFT JOIN photos ON reviews.id = photos.reviews_id
+                    LEFT JOIN photos ON reviews.review_id = photos.reviews_id
                    WHERE reviews.product_id = ${param.product_id}
-                   GROUP BY reviews.id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, reviews.date, reviews.reviewer_name, reviews.helpfulness
+                   GROUP BY reviews.review_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, reviews.date, reviews.reviewer_name, reviews.helpfulness
                    ORDER BY reviews.${param.sort} DESC
                    limit ${param.count}`), (err, data) => {
           if (err) {
@@ -65,37 +65,71 @@ module.exports = {
             }
             )
           }
-
         })
-
       }
-
-
-
     })
 
 
-},
- }
+  },
+
+  metaData: function (req) {
+    console.log('meta in here now?')
+    var storeQuery = {}
+    storeQuery['product_id'] = req.query.product_id
+    return new Promise((resolve, reject) => {
+      pool.query((`SELECT
+                  characteristics.id,
+                  characteristics.name,
+                  characteristics_review.value
+                  FROM characteristics
+                  LEFT JOIN characteristics_review
+                  ON characteristics.id = characteristics_review.id
+                  WHERE characteristics.product_id = ${req.query.product_id}`), (err, data1) => {
+        if (err) {
+          reject(err)
+        } else {
+          console.log("GET IN HERE?: ", data1.rows)
+          var character = {}
+          for (var item of data1.rows) {
+            character[item.name] = { 'id': item.id, 'value': item.value }
+          }
+          storeQuery['characteristics'] = character //store the characteristics in here
+          //SELECT count(*) FILTER (WHERE rank = ANY ('{a,b,v}')) AS myvalues
+          pool.query((`SELECT COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = true AND reviews.product_id = ${req.query.product_id}) AS trueL,
+                       COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = false AND reviews.product_id = ${req.query.product_id}) AS falseL
+                       FROM reviews`), (err, data2) => {
+            if (err) {
+              reject(err)
+            } else {
+              storeQuery['recommended'] = data2.rows
+              pool.query((`SELECT rating FROM reviews WHERE product_id = ${req.query.product_id}`), (err, data3) => {
+                if (err) {
+                  reject(err)
+                } else {
+                  console.log("data3: ", data3.rows)
+                  var rating = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+                  for (item of data3.rows) {
+                    rating[item.rating]++
+                  }
+                  storeQuery['rating'] = rating
+                  resolve(storeQuery)
+
+                }
+              })
+            }
+          })
+        }
+      })
+    })
+  },
 
 
 
-//  json_agg (
-//   json_build_object(
-//     'id', p.id,
-//     'url', p.url
-//     )
-//   )
-//    AS photos
-// FROM reviews r
-// LEFT JOIN photos p
-// ON r.id = p.reviews_id
 
-// COALESCE (
-//   json_agg (
-//     json_build_object (
-//       'id', p.id,
-//       'url', p.url
-//     )
-//   ),
-// '[]') AS photoss
+
+
+}
+
+
+
+

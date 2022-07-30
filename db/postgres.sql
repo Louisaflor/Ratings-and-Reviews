@@ -75,6 +75,10 @@ ALTER TABLE reviews
 ALTER COLUMN date TYPE TIMESTAMP
 USING (to_timestamp(date::decimal/1000));
 
+--need to change the id colum in reviews TABLE
+ALTER TABLE reviews
+RENAME COLUMN id TO review_id;
+
 --create my index for the important colums
 
 -- /reviews/

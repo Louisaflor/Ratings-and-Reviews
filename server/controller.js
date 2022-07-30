@@ -15,12 +15,7 @@ module.exports = {
     } else if (req.query.sort === 'newest') {
       changeSort = 'date'
     }
-    /**
-     page = 1
-     sort = 'relevant' 'helpful' 'newest'(date)
-     count = 5
-     product_id = NEED
-     */
+
     var param = {
       'page' :  !req.query.page ? 1 : Number(req.query.page),
       'sort' : changeSort , //!req.query.sort ? 'relevant' : req.query.sort,
@@ -42,7 +37,19 @@ module.exports = {
 
   },
 
-  getMeta: function() {
+  getMeta: async function(req, res) {
+
+    try {
+      const metaData = await model.metaData(req)
+      // console.log("WHAT IS THIS GOING TO BE: ", metaData)
+
+      // console.log('test:  ',character)
+
+      res.send(metaData)
+
+    } catch {
+
+    }
 
   },
 
