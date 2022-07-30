@@ -42,29 +42,49 @@ module.exports = {
     try {
       const metaData = await model.metaData(req)
       // console.log("WHAT IS THIS GOING TO BE: ", metaData)
-
       // console.log('test:  ',character)
-
       res.send(metaData)
+    } catch {
+      res.send(metaData)
+    }
+  },
+
+  post: async function(req, res) {
+    console.log("GOT IN POST")
+    try {
+      const data = await model.postDate(req.body)
+      console.log('data :', data)
+      res.send(data)
 
     } catch {
-
+      res.send(data)
     }
 
-  },
-
-  post: function() {
-
 
   },
 
-  helpful: function() {
+  helpful: async function(req, res) {
+    console.log("GIVE ME PARAM: ",req.params.review_id)
+
+    try {
+      const data = await model.addHelpful(req.params.review_id)
+      res.send(data)
+    } catch {
+      res.send()
+    }
 
   },
 
   report: function() {
 
   },
+
+  report: async function(req, res) {
+
+    // try {
+    //   const data = await
+    // }
+  }
 
 
 

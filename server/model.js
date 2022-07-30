@@ -6,7 +6,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
 
       if (typeof param.sort === 'object') {
-        pool.query((`SELECT
+        pool.query((`  SELECT
                     reviews.review_id,
                     reviews.rating,
                     reviews.summary,
@@ -123,13 +123,57 @@ module.exports = {
     })
   },
 
+  postDate: function(req) {
+    var date = new Date().toISOString();
+    console.log("SHOW ME DATA: ", req)
+    return new Promise((resolve, reject) => {
+      pool.query((`INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
+                   VALUES('${req.product_id}', '${req.rating}', '${date}', '${req.summary}', '${req.body}', '${req.recommend}', false, '${req.name}', '${req.email}', 0)
+                  `), (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          console.log("posted")
+          resolve('posted')
+        }
+      })
+
+    })
+  },
+
+  addHelpful: function(req) {
+
+    return new Promise((resolve, reject) => {
+      pool.query((`UPDATE reviews SET helpfulness = helpfulness + 1
+                  WHERE review_id = ${req}`), (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          console.log("COME IN HERE?")
+          resolve('added')
+        }
+      })
+    })
+  },
 
 
 
 
+
+
+//replace(___ 'null', '[]')
 
 }
 
 
 
 
+
+
+// ),
+// test2 AS (
+//   INSERT INTO photos VALUES(reviews_id, url)
+//   VALUES (SELECT review_id FROM reviews WHERE product_id = ${req.product_id}, re )
+// )
+// INSERT INTO
+// '${req.product_id}', '${req.rating}', '${date}', '${req.summary}', '${req.body}', '${req.recommend}', false, '${req.name}', '${req.email}', 0)
