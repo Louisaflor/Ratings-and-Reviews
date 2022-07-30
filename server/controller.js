@@ -68,9 +68,9 @@ module.exports = {
 
     try {
       const data = await model.addHelpful(req.params.review_id)
-      res.send(data)
+      res.sendStatus(201)
     } catch {
-      res.send()
+      res.send(data)
     }
 
   },
@@ -81,9 +81,12 @@ module.exports = {
 
   report: async function(req, res) {
 
-    // try {
-    //   const data = await
-    // }
+    try {
+      const data = await model.reportData(req.params.review_id)
+      res.sendStatus(201)
+    } catch {
+      res.send()
+    }
   }
 
 
