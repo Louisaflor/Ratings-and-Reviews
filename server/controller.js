@@ -53,7 +53,7 @@ module.exports = {
       return Promise.all(req.body.photos.map((photo) => {model.postPhotos(data.rows[0].review_id, photo)}))
       .then((result) => {
         console.log("GOT THE PHOTO RESULTS: ", result)
-        // res.send(results)
+        // res.send(results)test
       })
       .catch((err) => {
         console.log("error when posting photos: ", err)
