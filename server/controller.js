@@ -3,25 +3,21 @@ const model = require('./model.js');
 module.exports = {
 
   getAll: async function(req, res) {
-    var changeSort;
-    if (!req.query.sort || req.query.sort === 'relevant' ) {
-      changeSort = {
-        'helpful' : 'helpfulness',
-        'date' : 'date'
-      }
-    } else if (req.query.sort === 'helpful') {
-      changeSort = 'helpfulness'
-      console.log("CHANGE HERE")
-    } else if (req.query.sort === 'newest') {
-      changeSort = 'date'
-    }
-
     var param = {
       'page' :  !req.query.page ? 1 : Number(req.query.page),
-      'sort' : changeSort , //!req.query.sort ? 'relevant' : req.query.sort,
+      'sort' : null , //!req.query.sort ? 'relevant' : req.query.sort,
       'count' : !req.query.count ? 5 : Number(req.query.count),
       'product_id' : req.query.product_id
     }
+    var changeSort;
+    if (!req.query.sort || req.query.sort === 'relevant' ) {
+      param.sort = 'helpfulness DESC, reviews.date DESC'
+    } else if (req.query.sort === 'helpful') {
+      param.sort = 'helpfulness DESC'
+    } else if (req.query.sort === 'newest') {
+      param.sort = 'date DESC'
+    }
+
 
 
     console.log(param)
