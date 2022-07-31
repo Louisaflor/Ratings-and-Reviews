@@ -52,14 +52,24 @@ module.exports = {
       console.log("DATA: ", data.rows[0].review_id)
       return Promise.all(req.body.photos.map((photo) => {model.postPhotos(data.rows[0].review_id, photo)}))
       .then((result) => {
-        console.log("GOT THE PHOTO RESULTS: ", result)
-        // res.send(results)test
+        var charactersKeys = Object.keys(req.body.characteristics)
+        var characterValues = Object.keys(req.body.characteristics)
+        console.log("GIVE ME VALUES: ", charactersKeys, characterValues)
+        return Promise.all(charactersKeys.map((char, index) => {model.postCharacters(data.rows[0].review_id, char, characterValues[index])}))
+        .then((result) => {
+          console.log("what did I recieve? ", result)
+          res.send('sent')
+
+        }).catch((err) => {
+          console.log("ERROR IN POSTING CHARACTERS")
+        })
+
       })
       .catch((err) => {
         console.log("error when posting photos: ", err)
         res.send(err)
       })
-      res.send(data)
+
 
     } catch (err) {
      res.send(err)

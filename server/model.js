@@ -52,7 +52,7 @@ module.exports = {
                   characteristics_review.value
                   FROM characteristics
                   LEFT JOIN characteristics_review
-                  ON characteristics.id = characteristics_review.id
+                  ON characteristics.id = characteristics_review.characteristic_id
                   WHERE characteristics.product_id = ${req.query.product_id}`), (err, data1) => {
         if (err) {
           reject(err)
@@ -112,10 +112,17 @@ module.exports = {
   },
 
   postPhotos: function(id, photo) {
-    console.log("IN THE PHOTOS: ", id, photo)
     return pool.query(`INSERT INTO photos (id, reviews_id, url)
                       VALUES ((SELECT setval ('"photos_id_seq"', (SELECT MAX(id) FROM photos)+1)), ${id}, '${photo}')
                       returning *`)
+  },
+
+  postCharacters: function(review_id, char_id, value) {
+    console.log("WE GOT IN CHARACTERS: ", review_id, char_id, value)
+    return pool.query(`INSERT INTO characteristics_review (id, characteristic_id, review_id, value)
+                      VALUES ((SELECT setval ('"characteristics_review_id_seq"', (SELECT MAX(id) FROM characteristics_review)+1)), ${char_id}, ${review_id}, '${value}')
+                      returning *`)
+
   },
 
   addHelpful: function(req) {
@@ -155,15 +162,3 @@ module.exports = {
 }
 
 
-
-// req.photos.map((item) => {
-//   pool.query((`INSERT INTO photos (id, product_id, name)
-//               VALUES ((SELECT setval ('"photos_id_seq"', (SELECT MAX(id) FROM photos)+1)), ${req.product_id}, '${item}')`), (err) => {
-//     if (err) {
-//       reject(err)
-//     } else {
-//       resolve('added photos')
-//     }
-//   })
-
-// })
