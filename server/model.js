@@ -5,6 +5,7 @@ module.exports = {
   getData: function (req, param) {
     return new Promise((resolve, reject) => {
 
+      // COALESCE ( json_agg( json_build_object( 'id', photos.id,  'url', photos.url)), '[]' ) AS photos
 
         pool.query((`SELECT
                     reviews.review_id,
@@ -16,7 +17,12 @@ module.exports = {
                     reviews.date,
                     reviews.reviewer_name,
                     reviews.helpfulness,
-                    COALESCE ( json_agg( json_build_object( 'id', photos.id,  'url', photos.url)), '[]' ) AS photos
+                    (SELECT
+                      COALESCE(json_agg(row_to_json(photos)), '[]' :: json) photos
+                      FROM (
+                        SELECT id, url FROM photos WHERE photos.reviews_id = reviews.review_id
+                      ) photos
+                    )
                     FROM reviews
                     LEFT JOIN photos ON reviews.review_id = photos.reviews_id
                    WHERE reviews.product_id = ${param.product_id}
@@ -41,8 +47,10 @@ module.exports = {
 
   },
 
+
+
   metaData: function (req) {
-    console.log('meta in here now?')
+    // console.log('meta in here now?')
     var storeQuery = {}
     storeQuery['product_id'] = req.query.product_id
     return new Promise((resolve, reject) => {
@@ -64,8 +72,8 @@ module.exports = {
           }
           storeQuery['characteristics'] = character //store the characteristics in here
           //SELECT count(*) FILTER (WHERE rank = ANY ('{a,b,v}')) AS myvalues
-          pool.query((`SELECT COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = true AND reviews.product_id = ${req.query.product_id}) AS trueL,
-                       COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = false AND reviews.product_id = ${req.query.product_id}) AS falseL
+          pool.query((`SELECT COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = true AND reviews.product_id = ${req.query.product_id}) AS true,
+                       COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = false AND reviews.product_id = ${req.query.product_id}) AS false
                        FROM reviews`), (err, data2) => {
             if (err) {
               reject(err)
@@ -75,12 +83,14 @@ module.exports = {
                 if (err) {
                   reject(err)
                 } else {
-                  console.log("data3: ", data3.rows)
-                  var rating = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+                  // console.log("data3: ", data3.rows)
+                  var ratings = { 1: '0', 2: '0', 3: '0', 4: '0', 5: '0' }
                   for (item of data3.rows) {
-                    rating[item.rating]++
+                    var num = ratings[item.rating]++
+                    ratings[item.rating] = ratings[item.rating].toString()
+                    // console.log(typeof ratings[item.rating])
                   }
-                  storeQuery['rating'] = rating
+                  storeQuery['ratings'] = ratings
                   resolve(storeQuery)
 
                 }
@@ -93,17 +103,17 @@ module.exports = {
   },
 
   postReviews: function(req) {
-    console.log("IN HERE")
+    // console.log("IN HERE")
     var date = new Date().toISOString();
     return new Promise((resolve, reject) => {
-      pool.query((`INSERT INTO reviews (review_id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
-      VALUES((SELECT setval ('"reviews_review_id_seq"', (SELECT MAX(review_id) FROM reviews)+1)), ${req.product_id}, ${req.rating}, '${date}', '${req.summary}', '${req.body}', ${req.recommend}, false, '${req.name}', '${req.email}', null, 0) returning *
+      pool.query((`INSERT INTO reviews (review_id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, helpfulness)
+      VALUES((SELECT setval ('"reviews_review_id_seq"', (SELECT MAX(review_id) FROM reviews)+1)), ${req.product_id}, ${req.rating}, '${date}', '${req.summary}', '${req.body}', ${req.recommend}, false, '${req.name}', '${req.email}', 0) returning *
                   `), (err, data) => {
         if (err) {
-          console.log("ERROR WHEN POSTING DATA: ", err)
+          // console.log("ERROR WHEN POSTING DATA: ", err)
           reject(err)
         } else {
-          console.log("GOT IN HERE TOO: ")
+          // console.log("GOT IN HERE TOO: ")
           resolve(data)
         }
       })
@@ -118,7 +128,7 @@ module.exports = {
   },
 
   postCharacters: function(review_id, char_id, value) {
-    console.log("WE GOT IN CHARACTERS: ", review_id, char_id, value)
+    // console.log("WE GOT IN CHARACTERS: ", review_id, char_id, value)
     return pool.query(`INSERT INTO characteristics_review (id, characteristic_id, review_id, value)
                       VALUES ((SELECT setval ('"characteristics_review_id_seq"', (SELECT MAX(id) FROM characteristics_review)+1)), ${char_id}, ${review_id}, '${value}')
                       returning *`)
@@ -126,14 +136,14 @@ module.exports = {
   },
 
   addHelpful: function(req) {
-
+    // console.log("DID IT COME?")
     return new Promise((resolve, reject) => {
       pool.query((`UPDATE reviews SET helpfulness = helpfulness + 1
                   WHERE review_id = ${req}`), (err) => {
         if (err) {
           reject(err)
         } else {
-          console.log("COME IN HERE?")
+          // console.log("COME IN HERE?")
           resolve('added')
         }
       })
@@ -141,6 +151,7 @@ module.exports = {
   },
 
   reportData: function(req) {
+    // console.log("DID IT COME?")
     return new Promise((resolve, reject) => {
       pool.query((`UPDATE reviews SET reported = true
                   WHERE review_id = ${req}`), (err) => {
