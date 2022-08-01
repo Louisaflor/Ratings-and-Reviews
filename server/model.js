@@ -25,7 +25,7 @@ module.exports = {
                     )
                     FROM reviews
                     LEFT JOIN photos ON reviews.review_id = photos.reviews_id
-                   WHERE reviews.product_id = ${param.product_id}
+                   WHERE reviews.product_id = ${param.product_id} AND reviews.reported = false
                    GROUP BY reviews.review_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, reviews.date, reviews.reviewer_name, reviews.helpfulness
                    ORDER BY reviews.${param.sort}
                    limit ${param.count}`), (err, data) => {

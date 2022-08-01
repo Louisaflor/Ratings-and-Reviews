@@ -4,24 +4,11 @@ import { Rate } from 'k6/metrics';
 
 export const errorRate = new Rate('errors');
 
-// export const options = {
-//   vus: 30,
-//   duration: '30s',
-// };
 export const options = {
-  insecureSkipTLSVerify: true,
-  noConnectionReuse:false,
-  scenarios: {
-    constant_request_rate: {
-      executor: 'constant-arrival-rate',
-      rate: 1000,
-      timeUnit: '1s',
-      duration: '60s',
-      preAllocatedVUs: 100,
-      maxVUs: 150
-    }
-  },
+  vus: 150,
+  duration: '60s',
 };
+
 
 export default function () {
   let options = {
@@ -33,10 +20,25 @@ export default function () {
 
   check(url, {
     'status is 200': (r) => r.status == 200,
-    'response less than 5000ms': (r) => r.timings.duration < 5000,
+    'response less than 4000ms': (r) => r.timings.duration < 4000,
   }) || errorRate.add(1);
   sleep(1);
 }
 // http://localhost:3100/reviews?product_id=40344
 
 // https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfp/reviews/meta?product_id=40344
+
+// export const options = {
+//   insecureSkipTLSVerify: true,
+//   noConnectionReuse:false,
+//   scenarios: {
+//     constant_request_rate: {
+//       executor: 'constant-arrival-rate',
+//       rate: 1000,
+//       timeUnit: '1s',
+//       duration: '60s',
+//       preAllocatedVUs: 100,
+//       maxVUs: 150
+//     }
+//   },
+// };
