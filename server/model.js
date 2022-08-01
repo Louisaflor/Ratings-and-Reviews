@@ -47,57 +47,78 @@ module.exports = {
 
   },
 
+  /**
+   *
+  ,
+
+    //recommended
+    (SELECT
+      json_object_agg(recommend, count) as recommended
+       FROM (
+       SELECT recommend, COUNT(recommend) AS count
+        FROM reviews
+        WHERE product_id = ${req.product_id}
+        GROUP BY recommend
+        ) recommended
+    );
+
+    //ratings
+    (SELECT  )
+   */
 
 
   metaData: function (req) {
-    // console.log('meta in here now?')
+    console.log('meta in here now?')
     var storeQuery = {}
-    storeQuery['product_id'] = req.query.product_id
+    var product = {'product_id': req.query.product_id}
+    // storeQuery['product_id'] = req.query.product_id
     return new Promise((resolve, reject) => {
       pool.query((`SELECT
-                  characteristics.id,
-                  characteristics.name,
-                  characteristics_review.value
-                  FROM characteristics
-                  LEFT JOIN characteristics_review
-                  ON characteristics.id = characteristics_review.characteristic_id
-                  WHERE characteristics.product_id = ${req.query.product_id}`), (err, data1) => {
-        if (err) {
+
+       (SELECT
+      json_object_agg(name , json_build_object('id', id , 'value', value)) as characteristics
+      FROM (
+      SELECT characteristics.name AS name, characteristics.id AS id, AVG(characteristics_review.value) AS value
+      FROM characteristics_review
+      INNER JOIN characteristics
+      ON characteristics.id = characteristics_review.characteristic_id
+      WHERE characteristics.product_id = ${req.query.product_id}
+      GROUP BY characteristics.id
+      ) AS id_and_value),
+
+      (SELECT
+        json_object_agg(recommend, count) as recommended
+         FROM (
+         SELECT recommend, COUNT(recommend) AS count
+          FROM reviews
+          WHERE product_id = ${req.query.product_id}
+          GROUP BY recommend
+          ) recommended
+      ),
+
+      (SELECT
+        json_object_agg(rating, count) as ratings
+        FROM (
+          SELECT rating, COUNT(rating) AS count
+          FROM reviews
+          WHERE product_id = ${req.query.product_id}
+          GROUP BY rating
+        ) ratings
+      )
+
+      `), (err, data) => {
+        if(err) {
           reject(err)
         } else {
-          console.log("GET IN HERE?: ", data1.rows)
-          var character = {}
-          for (var item of data1.rows) {
-            character[item.name] = { 'id': item.id, 'value': item.value }
-          }
-          storeQuery['characteristics'] = character //store the characteristics in here
-          //SELECT count(*) FILTER (WHERE rank = ANY ('{a,b,v}')) AS myvalues
-          pool.query((`SELECT COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = true AND reviews.product_id = ${req.query.product_id}) AS true,
-                       COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = false AND reviews.product_id = ${req.query.product_id}) AS false
-                       FROM reviews`), (err, data2) => {
-            if (err) {
-              reject(err)
-            } else {
-              storeQuery['recommended'] = data2.rows
-              pool.query((`SELECT rating FROM reviews WHERE product_id = ${req.query.product_id}`), (err, data3) => {
-                if (err) {
-                  reject(err)
-                } else {
-                  // console.log("data3: ", data3.rows)
-                  var ratings = { 1: '0', 2: '0', 3: '0', 4: '0', 5: '0' }
-                  for (item of data3.rows) {
-                    var num = ratings[item.rating]++
-                    ratings[item.rating] = ratings[item.rating].toString()
-                    // console.log(typeof ratings[item.rating])
-                  }
-                  storeQuery['ratings'] = ratings
-                  resolve(storeQuery)
+          storeQuery = {
+            ...product,
+            ...data.rows[0]
 
-                }
-              })
-            }
-          })
+          }
+          console.log("WHAT WILL THIS STORE LOOK LIKE: ", storeQuery)
+          resolve(storeQuery)
         }
+
       })
     })
   },
@@ -171,5 +192,52 @@ module.exports = {
 //replace(___ 'null', '[]')
 
 }
+
+
+// SELECT
+//                   characteristics.id,
+//                   characteristics.name,
+//                   characteristics_review.value
+//                   FROM characteristics
+//                   LEFT JOIN characteristics_review
+//                   ON characteristics.id = characteristics_review.characteristic_id
+//                   WHERE characteristics.product_id = ${req.query.product_id}`), (err, data1) => {
+//         if (err) {
+//           reject(err)
+//         } else {
+//           console.log("GET IN HERE?: ", data1.rows)
+//           var character = {}
+//           for (var item of data1.rows) {
+//             character[item.name] = { 'id': item.id, 'value': item.value }
+//           }
+//           storeQuery['characteristics'] = character //store the characteristics in here
+//           //SELECT count(*) FILTER (WHERE rank = ANY ('{a,b,v}')) AS myvalues
+//           pool.query((`SELECT COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = true AND reviews.product_id = ${req.query.product_id}) AS true,
+//                        COUNT(reviews.recommend) FILTER (WHERE reviews.recommend = false AND reviews.product_id = ${req.query.product_id}) AS false
+//                        FROM reviews`), (err, data2) => {
+//             if (err) {
+//               reject(err)
+//             } else {
+//               storeQuery['recommended'] = data2.rows
+//               pool.query((`SELECT rating FROM reviews WHERE product_id = ${req.query.product_id}`), (err, data3) => {
+//                 if (err) {
+//                   reject(err)
+//                 } else {
+//                   // console.log("data3: ", data3.rows)
+//                   var ratings = { 1: '0', 2: '0', 3: '0', 4: '0', 5: '0' }
+//                   for (item of data3.rows) {
+//                     var num = ratings[item.rating]++
+//                     ratings[item.rating] = ratings[item.rating].toString()
+//                     // console.log(typeof ratings[item.rating])
+//                   }
+//                   storeQuery['ratings'] = ratings
+//                   resolve(storeQuery)
+
+//                 }
+//               })
+//             }
+//           })
+//         }
+//       }
 
 

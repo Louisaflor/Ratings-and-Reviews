@@ -53,7 +53,7 @@ CREATE TABLE characteristics_review (
   id SERIAL PRIMARY KEY,
   characteristic_id INTEGER,
   review_id INTEGER,
-  value TEXT,
+  value INTEGER,
   FOREIGN KEY (characteristic_id) REFERENCES characteristics(id),
   FOREIGN KEY (review_id) REFERENCES reviews(id)
 );
