@@ -25,7 +25,7 @@ export default function () {
 
   check(url, {
     'status is 200': (r) => r.status == 200,
-    'response less than 4000ms': (r) => r.timings.duration < 4000,
+    'response less than 2000ms': (r) => r.timings.duration < 2000,
   }) || errorRate.add(1);
   sleep(1);
 }
