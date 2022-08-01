@@ -4,6 +4,11 @@ import { Rate } from 'k6/metrics';
 
 export const errorRate = new Rate('errors');
 
+/*
+vus: the Current number of active virtual users
+duration: the total time for the request in the http_req_duration metric
+*/
+
 export const options = {
   vus: 150,
   duration: '60s',

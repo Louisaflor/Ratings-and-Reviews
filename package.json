@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/Parks-Rec/Ratings-and-Reviews#readme",
   "devDependencies": {
+    "chakram": "^1.5.0",
     "eslint": "^8.20.0",
     "eslint-plugin-react": "^7.30.1"
   }
