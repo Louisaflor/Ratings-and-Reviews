@@ -41,7 +41,7 @@ module.exports = {
       // console.log('test:  ',character)
       res.send(metaData)
     } catch (err) {
-      res.send(metaData)
+      res.send(err)
     }
   },
 
