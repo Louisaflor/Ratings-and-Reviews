@@ -13,7 +13,7 @@ export const errorRate = new Rate('errors');
 export default function () {
   let options = {
     headers: {
-      'Authorization': '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'
+      'Authorization': ''
     }
   }
   const url = http.get('http://localhost:3100/reviews?product_id=40344');
