@@ -108,6 +108,8 @@ CREATE INDEX reviews_product_id_index ON reviews(product_id);
 /* table reviews, column recommend  */
 CREATE INDEX reviews_recommend_index ON reviews(recommend);
 
+CREATE INDEX reviews_rating_index ON reviews(rating);
+
 /* table photos, column review_id  */
 CREATE INDEX photos_review_id_index ON photos(reviews_id);
 
@@ -125,4 +127,6 @@ CREATE INDEX characteristics_product_id_index ON characteristics(product_id);
 
 /* table characteristics_review, column charactertistics_id,  */
 CREATE INDEX characteristics_review_charactertistics_id_index ON characteristics_review(characteristic_id);
+
+CREATE INDEX characteristics_review_value_index ON characteristics_review(value);
 

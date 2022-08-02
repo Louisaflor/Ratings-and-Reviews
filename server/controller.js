@@ -58,7 +58,7 @@ module.exports = {
         return Promise.all(charactersKeys.map((char, index) => {model.postCharacters(data.rows[0].review_id, char, characterValues[index])}))
         .then((result) => {
           // console.log("what did I recieve? ", result)
-          res.send('sent')
+          res.sendStatus(201)
 
         }).catch((err) => {
           // console.log("ERROR IN POSTING CHARACTERS")
@@ -83,7 +83,7 @@ module.exports = {
 
     try {
       const data = await model.addHelpful(req.params.review_id)
-      res.sendStatus(200)
+      res.sendStatus(201)
     } catch (err) {
       res.send(err)
     }
