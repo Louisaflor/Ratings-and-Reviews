@@ -62,13 +62,13 @@ CREATE TABLE characteristics_review (
 
 
 -- need to copy the csv data ETL
-\COPY reviews FROM './data/reviews.csv' WITH (FORMAT CSV, HEADER);
+\COPY reviews FROM '/Users/louisayonzon/Downloads/reviews.csv' WITH (FORMAT CSV, HEADER);
 
-\COPY photos FROM './data/reviews_photos.csv' WITH (FORMAT CSV, HEADER);
+\COPY photos FROM '/Users/louisayonzon/Downloads/reviews_photos.csv' WITH (FORMAT CSV, HEADER);
 
-\COPY characteristics FROM './data/characteristics.csv' WITH (FORMAT CSV, HEADER);
+\COPY characteristics FROM '/Users/louisayonzon/Downloads/characteristics.csv' WITH (FORMAT CSV, HEADER);
 
-\COPY characteristics_review FROM './data/characteristic_reviews.csv' WITH (FORMAT CSV, HEADER);
+\COPY characteristics_review FROM '/Users/louisayonzon/Downloads/characteristic_reviews.csv' WITH (FORMAT CSV, HEADER);
 
 --need to change the format of the data in the reviews table
 ALTER TABLE reviews
