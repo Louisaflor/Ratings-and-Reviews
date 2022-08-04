@@ -11,10 +11,11 @@ const pool = new Pool({
   password: process.env.PASSWORD,
   port:  process.env.PORT,
   max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+
 })
 
+// idleTimeoutMillis: 30000,
+//   connectionTimeoutMillis: 2000,
 //congifure the user,host, and other properties
 // pool.on('error', (err, client) => {
 //   console.log('Error: ', err)
