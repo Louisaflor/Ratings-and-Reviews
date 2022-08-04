@@ -11,6 +11,9 @@ app.use(cors())
 //Tranfer to router file
 app.use('' , router);
 
+//loader io
+app.get(`/${process.env.LOADER_IO_KEY}`, (req, res) => {res.status(200).send(process.env.LOADER_IO_KEY)});
+
 
 
 let port = 3100
