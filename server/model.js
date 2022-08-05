@@ -68,7 +68,7 @@ module.exports = {
 
 
   metaData: function (req) {
-    console.log('meta in here now?')
+    // console.log('meta in here now?')
     var storeQuery = {}
     var product = {'product_id': req.query.product_id}
     // storeQuery['product_id'] = req.query.product_id
@@ -115,7 +115,7 @@ module.exports = {
             ...data.rows[0]
 
           }
-          console.log("WHAT WILL THIS STORE LOOK LIKE: ", storeQuery)
+          // console.log("WHAT WILL THIS STORE LOOK LIKE: ", storeQuery)
           resolve(storeQuery)
         }
 

@@ -46,7 +46,7 @@ module.exports = {
   },
 
   post: async function(req, res) {
-    console.log("GOT IN POST: ", req.body)
+    // console.log("GOT IN POST: ", req.body)
     try {
       const data = await model.postReviews(req.body)
       // console.log("DATA: ", data.rows[0].review_id)
