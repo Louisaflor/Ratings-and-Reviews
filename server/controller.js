@@ -83,7 +83,7 @@ module.exports = {
 
     try {
       const data = await model.addHelpful(req.params.review_id);
-      res.sendStatus(201);
+      res.sendStatus(204);
     } catch (err) {
       res.send(err);
     }
@@ -94,7 +94,7 @@ module.exports = {
   report: async function (req, res) {
     try {
       const data = await model.reportData(req.params.review_id);
-      res.sendStatus(201);
+      res.sendStatus(204);
     } catch (err) {
       res.send(err);
     }
